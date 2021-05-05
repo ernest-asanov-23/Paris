@@ -11,5 +11,5 @@ interface BackendAPI {
 
     suspend fun getResponseOptions(botId: Int): List<ResponseOption>
 
-    suspend fun respond(botId: Int, optionId: Int): Message
+    suspend fun respond(botId: Int, optionId: Int): List<Message>
 }
