@@ -9,9 +9,10 @@ import java.util.concurrent.atomic.AtomicInteger
 class DummyAPI : BackendAPI {
     private val messageId = AtomicInteger(1)
     override suspend fun getBots(): List<Bot> {
-        delay(200)
+        //delay(200)
         return listOf(
-            Bot(1, "dummy")
+            Bot(1, "Harry"),
+            Bot(2, "Mary")
         )
     }
 

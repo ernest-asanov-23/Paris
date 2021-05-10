@@ -31,6 +31,7 @@ class ChatFragment : Fragment() {
         val root = inflater.inflate(R.layout.chat_fragment, container, false)
         chatView = root.findViewById(R.id.chatView)
 
+
         return root
     }
 
