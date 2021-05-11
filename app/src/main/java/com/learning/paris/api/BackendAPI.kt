@@ -13,3 +13,31 @@ interface BackendAPI {
 
     suspend fun respond(botId: Int, optionId: Int): List<Message>
 }
+
+/*
+table Bots
+id
+name
+
+table Messages
+id
+botId
+text
+
+table Responses
+id
+text
+
+table ResponseOptions
+id
+messageId
+responseId
+nextMessageId
+
+table Dialogs
+id
+senderId
+type
+replyId
+
+ */

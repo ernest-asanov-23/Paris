@@ -11,8 +11,12 @@ import com.learning.paris.ui.chat.ChatViewModel
 class BotsViewModel : ViewModel() {
     suspend fun loadData() {
         val api = MainActivity.getAPI()
-        val bot_list = api.getBots()
-        mutableLiveData.postValue(bot_list)
+        try {
+            val bot_list = api.getBots()
+            mutableLiveData.postValue(bot_list)
+        } catch (e: Exception) {
+
+        }
     }
 
     private val mutableLiveData = MutableLiveData<List<Bot>>()

@@ -24,6 +24,7 @@ class BotsFragment : Fragment() {
     private lateinit var mainViewModel: MainViewModel
     private lateinit var botsListRV: RecyclerView
     private lateinit var botsAdapter: BotsAdapter
+    private var tryCounter = 0
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -46,12 +47,20 @@ class BotsFragment : Fragment() {
         mainViewModel.data.observe(viewLifecycleOwner, { list_b ->
             botsAdapter = BotsAdapter(list_b) { bot_ ->
                 // On bot name selected navigate to chat
-                    navigateToChat(bot_)
+                navigateToChat(bot_)
             }
             botsListRV.adapter = botsAdapter
-
+        })
+        mainViewModel.error.observe(viewLifecycleOwner, { error ->
+            if (tryCounter++ < 5) {
+                loadBots()
+            }
         })
 
+        loadBots()
+    }
+
+    private fun loadBots() {
         lifecycleScope.launchWhenCreated {
             mainViewModel.loadData()
         }

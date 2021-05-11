@@ -6,8 +6,9 @@ import com.learning.paris.data.ResponseOption
 import kotlinx.coroutines.delay
 import java.util.concurrent.atomic.AtomicInteger
 
-class DummyAPI : BackendAPI {
+object DummyAPI : BackendAPI {
     private val messageId = AtomicInteger(1)
+
     override suspend fun getBots(): List<Bot> {
         //delay(200)
         return listOf(

@@ -12,11 +12,17 @@ class MainViewModel : ViewModel() {
 
     suspend fun loadData() {
         val api = MainActivity.getAPI()
-        val bots = api.getBots()
-        mutableLiveData.postValue(bots)
+        try {
+            val bots = api.getBots()
+            mutableLiveData.postValue(bots)
+        } catch (e: Exception) {
+            mutableErrorData.postValue(e)
+        }
     }
 
     private val mutableLiveData = MutableLiveData<List<Bot>>()
-
     val data : LiveData<List<Bot>> = mutableLiveData
+
+    private val mutableErrorData = MutableLiveData<Exception>()
+    val error : LiveData<Exception> = mutableErrorData
 }

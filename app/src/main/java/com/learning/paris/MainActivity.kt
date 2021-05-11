@@ -14,6 +14,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import com.learning.paris.api.BackendAPI
 import com.learning.paris.api.DummyAPI
+import com.learning.paris.api.RetrofitAPI
 import com.learning.paris.ui.MainViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -32,8 +33,7 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        appBarConfiguration = AppBarConfiguration(setOf(
-                R.id.nav_bots, R.id.nav_chat, R.id.nav_slideshow), drawerLayout)
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_bots, R.id.nav_chat), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         fun getAPI(): BackendAPI {
-            return DummyAPI()
+            return RetrofitAPI
         }
     }
 }
