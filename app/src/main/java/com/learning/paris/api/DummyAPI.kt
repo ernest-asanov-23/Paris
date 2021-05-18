@@ -35,7 +35,7 @@ object DummyAPI : BackendAPI {
         ResponseOption(3, 3, "None of your business!"),
     )
 
-    override suspend fun getResponseOptions(botId: Int): List<ResponseOption> {
+    override suspend fun getResponseOptions(botId: Int, messageId: Int): List<ResponseOption> {
         if (botId == 1) {
             return responseOptions
         } else {

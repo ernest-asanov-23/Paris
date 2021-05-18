@@ -9,7 +9,7 @@ interface BackendAPI {
 
     suspend fun getDialog(botId: Int): List<Message>
 
-    suspend fun getResponseOptions(botId: Int): List<ResponseOption>
+    suspend fun getResponseOptions(botId: Int, messageId: Int): List<ResponseOption>
 
     suspend fun respond(botId: Int, optionId: Int): List<Message>
 }

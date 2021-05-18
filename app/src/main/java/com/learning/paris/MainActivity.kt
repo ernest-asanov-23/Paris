@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         fun getAPI(): BackendAPI {
-            return RetrofitAPI
+            return DummyAPI
         }
     }
 }

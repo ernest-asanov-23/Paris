@@ -9,13 +9,12 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
-import retrofit2.http.POST
+import retrofit2.http.*
 import kotlin.coroutines.suspendCoroutine
 
 object RetrofitAPI : BackendAPI {
 
-    private const val SERVER_URL = "https://jsonplaceholder.typicode.com/"
+    private const val SERVER_URL = "https://messenger-anduril.herokuapp.com"
     private val retrofit = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create())
         .baseUrl(SERVER_URL)
@@ -27,15 +26,20 @@ object RetrofitAPI : BackendAPI {
         @GET("bots")
         fun getBots(): Call<List<Bot>>
 
-        @GET("dialog")
-        fun getDialog(botId: Int): Call<List<Message>>
+        @GET("bot/{botId}/messages")
+        fun getDialog(@Path("botId") botId: Int): Call<List<Message>>
 
-        @GET("responses")
-        fun getResponseOptions(botId: Int): Call<ResponseOption>
+        @GET("bot/{botId}/responseOptions")
+        fun getResponseOptions(
+            @Path("botId") botId: Int,
+            @Query("messageId") messageId: Int
+        ): Call<List<ResponseOption>>
 
         @POST("respond")
-        fun respond(botId: Int, optionId: Int): Call<Message>
+        fun respond(botId: Int, @Body response: PostResponse): Call<List<Message>>
     }
+
+    data class PostResponse(val id: Int)
 
     override suspend fun getBots(): List<Bot> {
         val bots = suspendCoroutine<List<Bot>> { continuation ->
@@ -55,7 +59,7 @@ object RetrofitAPI : BackendAPI {
             api.getBots().enqueue(callback)
         }
 
-        return bots //.filter { it.name.startsWith("B") }
+        return bots
     }
 
     override suspend fun getDialog(botId: Int): List<Message> {
@@ -78,7 +82,7 @@ object RetrofitAPI : BackendAPI {
         return messages
     }
 
-    override suspend fun getResponseOptions(botId: Int): List<ResponseOption> {
+    override suspend fun getResponseOptions(botId: Int, messageId: Int): List<ResponseOption> {
         val responses = suspendCoroutine<List<ResponseOption>> { continuation ->
             val callback = object : Callback<List<ResponseOption>> {
                 override fun onResponse(call: Call<List<ResponseOption>>, response: Response<List<ResponseOption>>) {
@@ -93,7 +97,7 @@ object RetrofitAPI : BackendAPI {
                     continuation.resumeWith(Result.failure(t))
                 }
             }
-            api.getResponseOptions(botId).enqueue(callback)// Type mismatch. Required: Callback<ResponseOption!>!
+            api.getResponseOptions(botId, messageId).enqueue(callback)
         }
         return responses
     }
@@ -112,7 +116,7 @@ object RetrofitAPI : BackendAPI {
                     continuation.resumeWith(Result.failure(t))
                 }
             }
-            api.respond(botId, optionId).enqueue(callback) //Required: Callback<Message!>!
+            api.respond(botId, PostResponse(optionId)).enqueue(callback)
         }
         return responses
     }

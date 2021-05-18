@@ -12,30 +12,53 @@ class ChatViewModel : ViewModel() {
     class ChatData(
         val bot: Bot, val dialog: List<Message>, val responseOptions: List<ResponseOption>
     )
+    sealed class ChatLoadResult {
+        class Success(val data: ChatData) : ChatLoadResult()
+        class Fail(val exception: Exception): ChatLoadResult()
+    }
 
     suspend fun loadData(bot: Bot) {
         val api = MainActivity.getAPI()
-        val dialog = api.getDialog(bot.id)
-        val responseOptions = api.getResponseOptions(bot.id)
-        val chatData = ChatData(bot, dialog, responseOptions)
-        mutableLiveData.postValue(chatData)
+        try {
+            val dialog = api.getDialog(bot.id)
+            val message = dialog[dialog.size - 1]
+            val responseOptions = api.getResponseOptions(bot.id, message.id)
+            val chatData = ChatData(bot, dialog, responseOptions)
+            mutableLiveData.postValue(ChatLoadResult.Success(chatData))
+        } catch (e : Exception) {
+            mutableLiveData.postValue(ChatLoadResult.Fail(e))
+        }
     }
 
     suspend fun sendResponse(botId: Int, response: ResponseOption) {
         val api = MainActivity.getAPI()
-        val messages = api.respond(botId, response.id)
-        val oldData = mutableLiveData.value!!
+        try {
+            val messages = api.respond(botId, response.id)
+            val oldData = mutableLiveData.value!!
 
-        val oldDialog = oldData.dialog
-        val newDialog = oldDialog + messages
+            val (bot, dialog) = when (oldData) {
+                is ChatLoadResult.Success -> {
+                    val oldDialog = oldData.data.dialog
+                    Pair(oldData.data.bot, oldDialog + messages)
+                }
+                is ChatLoadResult.Fail -> {
+                    val bot = api.getBots().find {
+                        it.id == botId
+                    }!!
+                    Pair(bot, api.getDialog(botId))
+                }
+            }
 
-        val newResponseOptions = api.getResponseOptions(botId)
-        val newData = ChatData(oldData.bot, newDialog, newResponseOptions)
+            val newResponseOptions = api.getResponseOptions(botId, messages[1].id)
+            val newData = ChatData(bot, dialog, newResponseOptions)
 
-        mutableLiveData.postValue(newData)
+            mutableLiveData.postValue(ChatLoadResult.Success(newData))
+        } catch (e: Exception) {
+            mutableLiveData.postValue(ChatLoadResult.Fail(e))
+        }
     }
 
-    private val mutableLiveData = MutableLiveData<ChatData>()
+    private val mutableLiveData = MutableLiveData<ChatLoadResult>()
 
-    val data : LiveData<ChatData> = mutableLiveData
+    val data : LiveData<ChatLoadResult> = mutableLiveData
 }
